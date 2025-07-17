@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🔮 오늘의 운세 - 별자리 운세 서비스</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #fff;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('images/galaxy_background.jpg');
+            background-size: cover;
+            background-position: center;
+            opacity: 0.3;
+            z-index: -1;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 30px 0;
+        }
+
+        .header h1 {
+            font-size: 3rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+            background: linear-gradient(45deg, #ffd700, #ffb347);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        .input-form {
+            text-align: center;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 1.1rem;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        .form-group input {
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 10px;
+            padding: 15px;
+            font-size: 1rem;
+            color: #fff;
+            width: 100%;
+            max-width: 300px;
+            text-align: center;
+        }
+
+        .form-group input::placeholder {
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #ffd700;
+            box-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
+        }
+
+        .btn {
+            background: linear-gradient(45deg, #ffd700, #ffb347);
+            border: none;
+            border-radius: 15px;
+            padding: 15px 40px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: #333;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 215, 0, 0.4);
+        }
+
+        .fortune-result {
+            display: none;
+            animation: fadeInUp 0.8s ease;
+        }
+
+        .zodiac-info {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .zodiac-icon {
+            font-size: 4rem;
+            margin-bottom: 15px;
+            display: block;
+        }
+
+        .zodiac-name {
+            font-size: 2rem;
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: #ffd700;
+        }
+
+        .zodiac-date {
+            font-size: 1rem;
+            opacity: 0.8;
+        }
+
+        .fortune-categories {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .fortune-category {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 25px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .category-title {
+            font-size: 1.3rem;
+            font-weight: bold;
+            margin-bottom: 15px;
+            color: #ffd700;
+            display: flex;
+            align-items: center;
+        }
+
+        .category-title .icon {
+            margin-right: 10px;
+            font-size: 1.5rem;
+        }
+
+        .category-content {
+            font-size: 1rem;
+            line-height: 1.6;
+            opacity: 0.9;
+        }
+
+        .fortune-score {
+            display: flex;
+            align-items: center;
+            margin-top: 10px;
+        }
+
+        .score-label {
+            margin-right: 10px;
+            font-weight: bold;
+        }
+
+        .score-stars {
+            color: #ffd700;
+        }
+
+        .new-fortune-btn {
+            text-align: center;
+            margin-top: 30px;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 50px;
+            padding: 20px 0;
+            opacity: 0.7;
+            font-size: 0.9rem;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+            }
+
+            .header h1 {
+                font-size: 2.5rem;
+            }
+
+            .card {
+                padding: 20px;
+            }
+
+            .fortune-categories {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-top: 4px solid #ffd700;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔮 오늘의 운세</h1>
+            <p>별자리를 통해 당신의 오늘을 점쳐보세요</p>
+        </div>
+
+        <div class="card">
+            <div class="input-form" id="inputForm">
+                <h2 style="margin-bottom: 25px; color: #ffd700;">생년월일을 입력하세요</h2>
+                <div class="form-group">
+                    <label for="birthDate">생년월일</label>
+                    <input type="date" id="birthDate" placeholder="YYYY-MM-DD">
+                </div>
+                <button class="btn" onclick="generateFortune()">오늘의 운세 보기</button>
+            </div>
+
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+                <p>운세를 생성하고 있습니다...</p>
+            </div>
+
+            <div class="fortune-result" id="fortuneResult">
+                <div class="zodiac-info">
+                    <span class="zodiac-icon" id="zodiacIcon"></span>
+                    <div class="zodiac-name" id="zodiacName"></div>
+                    <div class="zodiac-date" id="zodiacDate"></div>
+                </div>
+
+                <div class="fortune-categories">
+                    <div class="fortune-category">
+                        <div class="category-title">
+                            <span class="icon">🌟</span>
+                            총운
+                        </div>
+                        <div class="category-content" id="overallFortune"></div>
+                        <div class="fortune-score">
+                            <span class="score-label">운세:</span>
+                            <span class="score-stars" id="overallScore"></span>
+                        </div>
+                    </div>
+
+                    <div class="fortune-category">
+                        <div class="category-title">
+                            <span class="icon">💕</span>
+                            사랑운
+                        </div>
+                        <div class="category-content" id="loveFortune"></div>
+                        <div class="fortune-score">
+                            <span class="score-label">운세:</span>
+                            <span class="score-stars" id="loveScore"></span>
+                        </div>
+                    </div>
+
+                    <div class="fortune-category">
+                        <div class="category-title">
+                            <span class="icon">💰</span>
+                            금전운
+                        </div>
+                        <div class="category-content" id="moneyFortune"></div>
+                        <div class="fortune-score">
+                            <span class="score-label">운세:</span>
+                            <span class="score-stars" id="moneyScore"></span>
+                        </div>
+                    </div>
+
+                    <div class="fortune-category">
+                        <div class="category-title">
+                            <span class="icon">💪</span>
+                            건강운
+                        </div>
+                        <div class="category-content" id="healthFortune"></div>
+                        <div class="fortune-score">
+                            <span class="score-label">운세:</span>
+                            <span class="score-stars" id="healthScore"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="new-fortune-btn">
+                    <button class="btn" onclick="resetForm()">새로운 운세 보기</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>© 2025 오늘의 운세. 엔터테인먼트 목적으로만 사용해주세요.</p>
+        </div>
+    </div>
+
+    <script>
+        // 별자리 데이터
+        const zodiacData = {
+            aquarius: { 
+                name: '물병자리', 
+                icon: '♒', 
+                dates: '1.20 - 2.18',
+                period: [120, 218] // 1월 20일 ~ 2월 18일
+            },
+            pisces: { 
+                name: '물고기자리', 
+                icon: '♓', 
+                dates: '2.19 - 3.20',
+                period: [219, 320]
+            },
+            aries: { 
+                name: '양자리', 
+                icon: '♈', 
+                dates: '3.21 - 4.19',
+                period: [321, 419]
+            },
+            taurus: { 
+                name: '황소자리', 
+                icon: '♉', 
+                dates: '4.20 - 5.20',
+                period: [420, 520]
+            },
+            gemini: { 
+                name: '쌍둥이자리', 
+                icon: '♊', 
+                dates: '5.21 - 6.21',
+                period: [521, 621]
+            },
+            cancer: { 
+                name: '게자리', 
+                icon: '♋', 
+                dates: '6.22 - 7.22',
+                period: [622, 722]
+            },
+            leo: { 
+                name: '사자자리', 
+                icon: '♌', 
+                dates: '7.23 - 8.22',
+                period: [723, 822]
+            },
+            virgo: { 
+                name: '처녀자리', 
+                icon: '♍', 
+                dates: '8.23 - 9.22',
+                period: [823, 922]
+            },
+            libra: { 
+                name: '천칭자리', 
+                icon: '♎', 
+                dates: '9.23 - 10.22',
+                period: [923, 1022]
+            },
+            scorpio: { 
+                name: '전갈자리', 
+                icon: '♏', 
+                dates: '10.23 - 11.21',
+                period: [1023, 1121]
+            },
+            sagittarius: { 
+                name: '사수자리', 
+                icon: '♐', 
+                dates: '11.22 - 12.21',
+                period: [1122, 1221]
+            },
+            capricorn: { 
+                name: '염소자리', 
+                icon: '♑', 
+                dates: '12.22 - 1.19',
+                period: [1222, 1231, 101, 119] // 연말-연초를 걸침
+            }
+        };
+
+        // 운세 메시지 데이터
+        const fortuneMessages = {
+            overall: [
+                "오늘은 새로운 기회가 찾아올 것 같습니다. 열린 마음으로 하루를 시작해보세요.",
+                "평온한 하루가 될 것 같습니다. 작은 행복들을 놓치지 마세요.",
+                "도전적인 하루가 될 것 같습니다. 용기를 내어 한 걸음 더 나아가보세요.",
+                "행운이 가득한 하루입니다. 긍정적인 에너지로 하루를 채워보세요.",
+                "변화의 바람이 불고 있습니다. 새로운 시작을 준비해보세요.",
+                "안정적인 하루가 예상됩니다. 꾸준함이 가져다줄 성과를 기대해보세요.",
+                "창의력이 빛나는 하루입니다. 새로운 아이디어를 실현해보세요.",
+                "인간관계에서 좋은 소식이 있을 것 같습니다. 주변 사람들과 소통해보세요."
+            ],
+            love: [
+                "연인과의 관계가 더욱 깊어질 것 같습니다. 진솔한 대화를 나누어보세요.",
+                "새로운 만남의 기회가 있을 것 같습니다. 적극적으로 나서보세요.",
+                "과거의 인연이 다시 연결될 수도 있습니다. 열린 마음으로 기다려보세요.",
+                "사랑하는 사람에게 마음을 표현하기 좋은 날입니다.",
+                "감정적인 공감대가 형성되기 쉬운 하루입니다.",
+                "로맨틱한 순간들이 기다리고 있습니다. 특별한 시간을 만들어보세요.",
+                "이해와 배려가 필요한 시기입니다. 상대방의 마음을 헤아려보세요.",
+                "사랑에 관한 중요한 결정을 내리기 좋은 때입니다."
+            ],
+            money: [
+                "예상치 못한 수입이 있을 수도 있습니다. 금전 관리에 신경써보세요.",
+                "투자나 저축에 관심을 가져보세요. 미래를 위한 준비가 필요합니다.",
+                "지출을 조심해야 할 날입니다. 계획적인 소비를 하세요.",
+                "금전적 기회가 찾아올 것 같습니다. 현명한 판단이 필요합니다.",
+                "재정 관리를 점검해볼 좋은 시기입니다.",
+                "수입원을 다양화할 기회가 있을 것 같습니다.",
+                "큰 지출을 앞두고 있다면 신중하게 검토해보세요.",
+                "금전적 안정을 위한 계획을 세워보세요."
+            ],
+            health: [
+                "활력이 넘치는 하루가 될 것 같습니다. 운동을 해보세요.",
+                "휴식이 필요한 시기입니다. 몸의 신호에 귀 기울여보세요.",
+                "건강한 식습관을 유지하는 것이 중요합니다.",
+                "스트레스 해소에 신경써보세요. 취미 활동을 즐겨보세요.",
+                "새로운 건강 관리 방법을 시도해보기 좋은 날입니다.",
+                "규칙적인 생활 패턴이 도움이 될 것 같습니다.",
+                "정신적 건강도 함께 챙겨보세요. 명상이나 산책을 추천합니다.",
+                "충분한 수면을 취하는 것이 중요합니다."
+            ]
+        };
+
+        // 해시 함수 (시드 생성용)
+        function simpleHash(str) {
+            let hash = 0;
+            for (let i = 0; i < str.length; i++) {
+                const char = str.charCodeAt(i);
+                hash = ((hash << 5) - hash) + char;
+                hash = hash & hash; // 32비트 정수로 변환
+            }
+            return Math.abs(hash);
+        }
+
+        // 시드 기반 랜덤 함수
+        function seededRandom(seed) {
+            const x = Math.sin(seed) * 10000;
+            return x - Math.floor(x);
+        }
+
+        // 별자리 계산
+        function getZodiacSign(birthDate) {
+            const date = new Date(birthDate);
+            const month = date.getMonth() + 1;
+            const day = date.getDate();
+            const monthDay = month * 100 + day;
+
+            for (const [key, zodiac] of Object.entries(zodiacData)) {
+                if (key === 'capricorn') {
+                    // 염소자리는 연말-연초를 걸침
+                    if (monthDay >= 1222 || monthDay <= 119) {
+                        return { key, ...zodiac };
+                    }
+                } else {
+                    const [start, end] = zodiac.period;
+                    if (monthDay >= start && monthDay <= end) {
+                        return { key, ...zodiac };
+                    }
+                }
+            }
+            return { key: 'aquarius', ...zodiacData.aquarius }; // 기본값
+        }
+
+        // 운세 점수 생성 (1-5점)
+        function generateScore(seed) {
+            return Math.floor(seededRandom(seed) * 5) + 1;
+        }
+
+        // 별점 표시
+        function getStarRating(score) {
+            return '★'.repeat(score) + '☆'.repeat(5 - score);
+        }
+
+        // 운세 생성
+        function generateDailyFortune(birthDate) {
+            const today = new Date().toISOString().split('T')[0];
+            const seed = simpleHash(birthDate + today);
+            
+            // localStorage에서 오늘 운세 확인
+            const storageKey = `fortune_${birthDate}_${today}`;
+            const savedFortune = localStorage.getItem(storageKey);
+            
+            if (savedFortune) {
+                return JSON.parse(savedFortune);
+            }
+
+            // 새로운 운세 생성
+            const zodiac = getZodiacSign(birthDate);
+            
+            const fortune = {
+                zodiac: zodiac,
+                overall: fortuneMessages.overall[seed % fortuneMessages.overall.length],
+                love: fortuneMessages.love[(seed + 1) % fortuneMessages.love.length],
+                money: fortuneMessages.money[(seed + 2) % fortuneMessages.money.length],
+                health: fortuneMessages.health[(seed + 3) % fortuneMessages.health.length],
+                scores: {
+                    overall: generateScore(seed),
+                    love: generateScore(seed + 1),
+                    money: generateScore(seed + 2),
+                    health: generateScore(seed + 3)
+                }
+            };
+
+            // localStorage에 저장
+            localStorage.setItem(storageKey, JSON.stringify(fortune));
+            return fortune;
+        }
+
+        // 운세 표시
+        function displayFortune(fortune) {
+            document.getElementById('zodiacIcon').textContent = fortune.zodiac.icon;
+            document.getElementById('zodiacName').textContent = fortune.zodiac.name;
+            document.getElementById('zodiacDate').textContent = fortune.zodiac.dates;
+            
+            document.getElementById('overallFortune').textContent = fortune.overall;
+            document.getElementById('loveFortune').textContent = fortune.love;
+            document.getElementById('moneyFortune').textContent = fortune.money;
+            document.getElementById('healthFortune').textContent = fortune.health;
+            
+            document.getElementById('overallScore').textContent = getStarRating(fortune.scores.overall);
+            document.getElementById('loveScore').textContent = getStarRating(fortune.scores.love);
+            document.getElementById('moneyScore').textContent = getStarRating(fortune.scores.money);
+            document.getElementById('healthScore').textContent = getStarRating(fortune.scores.health);
+        }
+
+        // 운세 생성 메인 함수
+        function generateFortune() {
+            const birthDate = document.getElementById('birthDate').value;
+            
+            if (!birthDate) {
+                alert('생년월일을 입력해주세요.');
+                return;
+            }
+
+            // 로딩 표시
+            document.getElementById('inputForm').style.display = 'none';
+            document.getElementById('loading').style.display = 'block';
+
+            // 로딩 시뮬레이션 (2초)
+            setTimeout(() => {
+                const fortune = generateDailyFortune(birthDate);
+                displayFortune(fortune);
+                
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('fortuneResult').style.display = 'block';
+            }, 2000);
+        }
+
+        // 폼 리셋
+        function resetForm() {
+            document.getElementById('fortuneResult').style.display = 'none';
+            document.getElementById('inputForm').style.display = 'block';
+            document.getElementById('birthDate').value = '';
+        }
+
+        // 엔터키 이벤트
+        document.getElementById('birthDate').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                generateFortune();
+            }
+        });
+
+        // 페이지 로드 시 오늘 날짜를 최대값으로 설정
+        window.addEventListener('load', function() {
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('birthDate').max = today;
+        });
+    </script>
+</body>
+</html>
